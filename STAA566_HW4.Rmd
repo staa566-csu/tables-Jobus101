@@ -1,0 +1,57 @@
+---
+title: "index"
+author: "John Bushey"
+date: "10/11/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Data Source: The data source I used for this assignment is data from the Actuary Climate Index. I specifically wanted to look at the final sea level change for each region.
+
+For the table I wanted to convey the final change in sea level over the last 60 years for each North American Region. I did this by filtering to the final sea level in my data file.
+
+For Functionality, I added the Hover option. I did this to make it easier to read the column, and to select the right column. I did this since the table is so long, and difficult to read. I wanted to add a trend for the change over 60 years, however I could not get my code to work, so I removed it.
+
+For Formatting I increased the font to 18, I also centered the data in the columns. I also added a title above the whole table. I used the KBLe function since I liked the look of this table best.
+
+```{r}
+#Bringing in data from the Actuaries Climate Index
+library(ggplot2)
+library(reshape2)
+library(plotly)
+library(htmlwidgets)
+library(knitr)
+library(tidyr)
+library(kableExtra)
+
+SL <- readxl::read_excel("C:/Users/14252/Desktop/ACI_JDB.xlsx",sheet = 2)
+SL$time <-paste(SL$Year,"-",SL$Month,"-01")
+
+#change to long format
+SL <- melt(SL, id.vars= c("time","Year", "Month"))
+#SL
+#change time from character to date
+SL$time <- as.Date(SL$time, format = "%Y - %m -%d")
+# limit to most recent day
+SL2 <- SL %>% 
+  filter(time == max(time)) %>%
+  drop_na()
+
+
+SL3 <- SL2 %>%
+  select(time, variable, value) %>%
+  kbl(col.names = c("Date",
+                    "Region",
+                    "mm change from origin"),
+  align = c("c", "c", "c")) %>%
+  kable_styling(font_size = 18) %>%
+  add_header_above(c("Summary of Sea level Change by Region" = 3)) %>%
+  kable_paper(lightable_options = "hover", full_width = FALSE)
+SL3
+```
+
+
+
+
